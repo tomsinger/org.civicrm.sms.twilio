@@ -26,7 +26,8 @@
 */
 
 // Load the official Twilio library
-require_once 'Services/Twilio.php';
+require "vendor/autoload.php";
+use Twilio\Rest\Client;
 
 /**
  *
@@ -93,7 +94,8 @@ class org_civicrm_sms_twilio extends CRM_SMS_Provider {
     ) {
       $sid = $this->_providerInfo['username'];
       $token = $this->_providerInfo['password'];
-      $this->_twilioClient = new Services_Twilio($sid, $token);
+
+      $this->_twilioClient = new Client($sid, $token);
     }
 
     if ($skipAuth) {
@@ -153,11 +155,14 @@ class org_civicrm_sms_twilio extends CRM_SMS_Provider {
       }
 
       try {
-        $twilioMessage = $this->_twilioClient->account->sms_messages->create(
-          $from,
-          $header['To'],
-          $message
+        $twilioMessage = $this->_twilioClient->messages->create(
+          $header['To'], // Text this number
+          array(
+            'from' => $from, // From a valid Twilio number
+            'body' => $message
+          )
         );
+
       } catch (Exception $e) {
         $errMsg = $e->getMessage()
           . ' For more information, see '
