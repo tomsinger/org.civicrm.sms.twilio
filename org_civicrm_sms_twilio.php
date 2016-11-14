@@ -149,26 +149,26 @@ class org_civicrm_sms_twilio extends CRM_SMS_Provider {
    */
   function send($recipients, $header, $message, $jobID = NULL, $userID = NULL) {
     if ($this->_apiType == 'http') {
-      $from = '';
-      if (array_key_exists('From', $this->_providerInfo['api_params'])) {
-        $from = $this->_providerInfo['api_params']['From'];
+      $content = array( 'body' => $message . " \nTo opt out text STOP to 07903577525" );
+
+      if (array_key_exists('MessagingServiceSid', $this->_providerInfo['api_params'])) {
+        $content['MessagingServiceSid'] = $this->_providerInfo['api_params']['MessagingServiceSid'];
+      } else if (array_key_exists('From', $this->_providerInfo['api_params'])) {
+        $content['from'] = $this->_providerInfo['api_params']['From'];
+      }
+
+      if (substr($header['To'], 0, 1) === "0") {
+        $header['To'] = "+44" . substr($header['To'], 1, strlen($header['To']));
       }
 
       try {
         $twilioMessage = $this->_twilioClient->messages->create(
           $header['To'], // Text this number
-          array(
-            'from' => $from, // From a valid Twilio number
-            'body' => $message
-          )
+          $content
         );
-
       } catch (Exception $e) {
-        $errMsg = $e->getMessage()
-          . ' For more information, see '
-          . $e->getInfo();
         return PEAR::raiseError(
-          $errMsg,
+          $e->getMessage(),
           $e->getCode(),
           PEAR_ERROR_RETURN
         );
