@@ -1,0 +1,12 @@
+{
+    "name": "root/org.civicrm.sms.twilio",
+    "require": {
+        "twilio/sdk": "~5.4"
+    },
+    "authors": [
+        {
+            "name": "Tom Singer",
+            "email": "tomsinger@gmail.com"
+        }
+    ]
+}
