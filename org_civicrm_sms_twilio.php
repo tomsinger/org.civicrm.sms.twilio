@@ -149,7 +149,11 @@ class org_civicrm_sms_twilio extends CRM_SMS_Provider {
    */
   function send($recipients, $header, $message, $jobID = NULL, $userID = NULL) {
     if ($this->_apiType == 'http') {
-      $content = array( 'body' => $message . " \nTo opt out text STOP to 07903577525" );
+      if (array_key_exists('append', $this->_providerInfo['api_params'])) {
+        $message .= "\n" . $this->_providerInfo['api_params']['append'];
+      }
+
+      $content = array( 'body' => $message );
 
       if (array_key_exists('MessagingServiceSid', $this->_providerInfo['api_params'])) {
         $content['MessagingServiceSid'] = $this->_providerInfo['api_params']['MessagingServiceSid'];
